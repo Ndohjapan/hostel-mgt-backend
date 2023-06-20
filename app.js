@@ -87,7 +87,7 @@ async function consumeMessages() {
 
   await channel.bindQueue(q.queue, "schoolExchange", "hostel");
 
-  channel.consume(q.queue, async(msg) => {
+  channel.consume(q.queue, async (msg) => {
     const data = JSON.parse(msg.content);
     console.log(data);
     // await Error.create({logType: data.logType, message: data.message});

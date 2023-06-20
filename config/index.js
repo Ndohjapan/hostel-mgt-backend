@@ -1,7 +1,7 @@
 
 module.exports = {
-    dev: require("./dev"), 
-    prod: require("./prod"), 
-    test: require("./test"),
-    staging: require("./staging")
-  };
+  dev: require("./dev"), 
+  prod: require("./prod"), 
+  test: require("./test"),
+  staging: require("./staging")
+};

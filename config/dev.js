@@ -2,7 +2,7 @@
 require("dotenv").config();
 module.exports = {
   database: {
-    URL: "mongodb://127.0.0.1:27017/school-portal-dev"
+    URL: "mongodb://127.0.0.1:27017/hostel-mgt-dev"
   },
 
   session: {
