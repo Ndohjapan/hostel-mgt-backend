@@ -31,5 +31,9 @@ module.exports = {
   hostel_not_found: "Hostel is not found",
   room_server_error: "Error creating room",
   room_duplicate_error: "Room already exists in this hostel",
-  room_not_found: "Room is not found"
+  user_room_duplicate_error: "User already exists in another room",
+  room_not_found: "Room is not found",
+  room_is_full: "Room size exceeds the limit of ",
+  id_null: "Id cannot be null",
+  id_format: "Id must be a string",
 };

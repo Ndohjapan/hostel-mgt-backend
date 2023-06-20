@@ -54,6 +54,19 @@ class UserRepository {
     });
   }
 
+  
+  async UpdateOne({id, updateData}){
+    try {
+      const user = await User.findByIdAndUpdate(id, updateData, {new: true});
+      return user;
+        
+    } catch (error) {
+      throw new internalException(
+        en.room_update_server_error
+      );
+    }
+  }
+
   async FilterUsers({page, limit, data}){
     // eslint-disable-next-line no-unused-vars
     return new Promise((resolve, reject) => {

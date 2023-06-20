@@ -4,7 +4,6 @@ const app = require("../src/app");
 const { connectToDatabase, mongoose } = require("../src/database/connection");
 const { Hostel, Porter, Room } = require("../src/database/model");
 const mockData = require("./resources/mock-data");
-const en = require("../locale/en");
 const porterCredentials = { email: "porter1@mail.com", password: "P4ssword" };
 
 let token;

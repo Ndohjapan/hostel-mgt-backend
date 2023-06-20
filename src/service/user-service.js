@@ -1,6 +1,7 @@
 const UserRepository = require("../database/repository/user-repository");
 const en = require("../../locale/en");
 const NotFoundException = require("../error/not-found-exception");
+const UpdateException = require("../error/update-exception");
 
 class UserService {
   constructor() {
@@ -71,6 +72,29 @@ class UserService {
     } catch (error) {
       throw new NotFoundException();
     }
+  }
+
+  async UpdateOne(id, data){
+    let updateData = {};
+
+    data.amountPaid = "";
+    data.totalAmount = "";
+    data.userId = "";
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (value != "") {
+        updateData[key] = value;
+      }
+    });
+    
+    try {
+      const user = await this.repository.UpdateOne({id, updateData});
+    
+      return user;
+        
+    } catch (error) {
+      throw new UpdateException();        
+    }    
   }
 }
 
