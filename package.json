@@ -10,7 +10,7 @@
     "test:cleanup": "cross-env NODE_ENV=test node testdb-cleanup.js",
     "staging": "cross-env NODE_ENV=staging node index.js",
     "start": "cross-env NODE_ENV=prod node index.js",
-    "seed:up": "node src/database/seed.js up",
+    "seed:up": "cross-env NODE_ENV=staging node src/database/seed.js up",
     "seed:down": "node src/database/seed.js down"
   },
   "author": "Ndoh Joel",
