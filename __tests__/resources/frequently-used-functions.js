@@ -94,4 +94,14 @@ const addHostel = async (num = 1, hostels = [mockData.hostel]) => {
   return data;
 };
 
-module.exports = {addUser, porterLogin, addHostel, addRoom};
+const assignStudentToRoom = async (roomId, userId) => {
+  let agent = request(app).post("/api/1.0/user/assign").set("origin", "localhost:7001");
+  
+  if(token){
+    agent.set("x-access-token", token);
+  }
+  
+  return await agent.send({roomId, userId});
+};
+
+module.exports = {addUser, porterLogin, addHostel, addRoom, assignStudentToRoom};

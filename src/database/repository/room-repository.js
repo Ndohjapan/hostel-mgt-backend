@@ -21,7 +21,7 @@ class RoomRepository {
 
   async FindRoomById(id){
     try {
-      const room = await Room.findById(id);
+      const room = await Room.findById(id).populate("students");
       return room;
     } catch (error) {
       throw new internalException(

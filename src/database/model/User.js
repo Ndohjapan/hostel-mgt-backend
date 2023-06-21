@@ -67,6 +67,7 @@ const UserSchema = new mongoose.Schema({
   room: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "room",
+    default: null
   }
 });
 

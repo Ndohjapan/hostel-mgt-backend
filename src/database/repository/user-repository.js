@@ -17,7 +17,7 @@ class UserRepository {
 
   async FindUserById(id){
     try {
-      const user = await User.findById(id);
+      const user = await User.findById(id).excludeFields(["userId"]);
       return user;
     } catch (error) {
       throw new internalException(
