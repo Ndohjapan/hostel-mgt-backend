@@ -163,6 +163,22 @@ describe("Get User By Id", () => {
 
     expect(response.body.room.hostel.name).toBe(hostels[0].name);
   });
+
+  it("check - ensure that the userid refrence from school portal is not returned", async() => {
+    const users = await addUser();
+    await porterLogin();
+    const response = await getUser(users[0].id);
+
+    expect(response.body.userId).toBeFalsy();
+  });
+
+  it("check - ensure that the room value is set to null when the user is yet to be assigned a room", async() => {
+    const users = await addUser();
+    await porterLogin();
+    const response = await getUser(users[0].id);
+
+    expect(response.body.room).toBeFalsy();
+  });
 });
 
 describe("Get All User with Pagination", () => {

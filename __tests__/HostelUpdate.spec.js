@@ -7,6 +7,7 @@ const {
 } = require("../src/database/connection");
 const mockData = require("./resources/mock-data");
 const { Porter, Hostel } = require("../src/database/model");
+const en = require("../locale/en");
 const porterCredentials = { email: "porter1@mail.com", password: "P4ssword" };
 
 let token;
@@ -64,6 +65,40 @@ describe("Update One Hostel", () => {
 
     return await agent.send(updateData);
   };
+
+  it("return - HTTP 400 when we try to update with a negative number", async() => {
+    const hostels = await addHostel();
+    await porterLogin();
+    const response = await updateHostel(hostels[0].id, {maxPerRoom: -1});
+
+    expect(response.status).toBe(400);
+  });
+
+  it(`return - ${en.max_per_room_format} when we try to update with a negative number`, async() => {
+    const hostels = await addHostel();
+    await porterLogin();
+    const response = await updateHostel(hostels[0].id, {maxPerRoom: 0});
+
+    expect(response.body.message).toBe(en.validation_failure);
+    expect(response.body.validationErrors.maxPerRoom).toBe(en.max_per_room_format);
+  });
+
+  it("return - HTTP 400 when we try to update with a wrong sex", async() => {
+    const hostels = await addHostel();
+    await porterLogin();
+    const response = await updateHostel(hostels[0].id, {sex: "Foreign"});
+
+    expect(response.status).toBe(400);
+  });
+
+  it(`return - ${en.sex_format} when we try to update with a negative number`, async() => {
+    const hostels = await addHostel();
+    await porterLogin();
+    const response = await updateHostel(hostels[0].id, {sex: "Foreign"});
+
+    expect(response.body.message).toBe(en.validation_failure);
+    expect(response.body.validationErrors.sex).toBe(en.sex_format);
+  });
 
   it("return - HTTP 200 ok when update is successful", async() => {
     const hostels = await addHostel();

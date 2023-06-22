@@ -15,6 +15,7 @@ class RoomService{
           hostel: data.hostel,
           maxPerRoom: data.maxPerRoom,
           roomNum: i,
+          numOfStudents: 0
         });
       }
       const rooms = await this.repository.CreateRooms(room);
@@ -41,7 +42,7 @@ class RoomService{
       const users = await this.repository.FindAll({page, limit});
       return users;
     } catch (error) {
-      throw new NotFoundException(en.user_not_found);
+      throw new NotFoundException(en.room_not_found);
         
     }
   }
@@ -54,7 +55,6 @@ class RoomService{
         updateData[key] = value;
       }
     });
-
     try {
       const users = await this.repository.FilterRooms({page, limit, data});
       return users;
@@ -69,6 +69,7 @@ class RoomService{
     data.students = "";
     data.hostel = "";
     data.roomNum = "";
+    data.numOfStudents = "";
 
     Object.entries(data).forEach(([key, value]) => {
       if (value != "") {
@@ -85,6 +86,38 @@ class RoomService{
       throw new   UpdateException();        
     }    
   }
+
+  async AssignToRoom(roomId, userId){
+    try {
+      const room = await this.repository.AssignToRoom(roomId, userId);
+      return room;        
+    } catch (error) {
+      throw new UpdateException(error.message);
+        
+    }
+  }
+
+  async RemoveFromRoom(roomId, userId){
+    try {
+      const room = await this.repository.RemoveFromRoom(roomId, userId);
+      return room;        
+    } catch (error) {
+      throw new UpdateException(error.message);
+        
+    }
+  }
+
+  async FindAvailableRooms(hostelId){
+    try {
+      const rooms = await this.repository.FilterAvailableRooms(hostelId);
+      return rooms;        
+    } catch (error) {
+      throw new NotFoundException(en.room_not_found);
+        
+    }
+  }
+
+
 
 }
 

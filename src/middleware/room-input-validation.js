@@ -31,19 +31,19 @@ const validateRoomDataInput = [
     .notEmpty()
     .withMessage(en.max_per_room_null)
     .bail()
-    .isNumeric()
+    .isInt({min: 1})
     .withMessage(en.max_per_room_format),
   check("from")
     .notEmpty()
     .withMessage(en.from_null)
     .bail()
-    .isNumeric()
+    .isInt({min: 1})
     .withMessage(en.from_format),
   check("to")
     .notEmpty()
     .withMessage(en.to_null)
     .bail()
-    .isNumeric()
+    .isInt({min: 1})
     .withMessage(en.to_format),
     
   (req, res, next) => {
@@ -55,4 +55,19 @@ const validateRoomDataInput = [
   }
 ];
 
-module.exports = { validateRoomId, validateRoomDataInput };
+const validateUpdateRoomDataInput = [
+  check("maxPerRoom")
+    .optional()
+    .isInt({min: 1})
+    .withMessage(en.max_per_room_format),
+    
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(new ValidationException(errors.array()));
+    }
+    next();
+  }
+];
+
+module.exports = { validateRoomId, validateRoomDataInput, validateUpdateRoomDataInput };

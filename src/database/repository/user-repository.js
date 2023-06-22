@@ -17,7 +17,7 @@ class UserRepository {
 
   async FindUserById(id){
     try {
-      const user = await User.findById(id);
+      const user = await User.findById(id).excludeFields(["userId"]);
       return user;
     } catch (error) {
       throw new internalException(
@@ -52,6 +52,19 @@ class UserRepository {
       }
 
     });
+  }
+
+  
+  async UpdateOne({id, updateData}){
+    try {
+      const user = await User.findByIdAndUpdate(id, updateData, {new: true});
+      return user;
+        
+    } catch (error) {
+      throw new internalException(
+        en.room_update_server_error
+      );
+    }
   }
 
   async FilterUsers({page, limit, data}){

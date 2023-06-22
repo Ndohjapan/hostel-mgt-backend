@@ -1,5 +1,5 @@
 const { porterAuth } = require("../middleware/protect");
-const { validateHostelId, validateHostelDataInput } = require("../middleware/hostel-input-validation");
+const { validateHostelId, validateHostelDataInput, validateUpdateHostelDataInput } = require("../middleware/hostel-input-validation");
 const { HostelService } = require("../service/hostel-service");
 const catchAsync = require("../util/catch-async");
 
@@ -30,7 +30,7 @@ module.exports = async(app) => {
     res.send(users);
   }));
 
-  app.patch("/api/1.0/hostel/:id", validateHostelId, porterAuth, catchAsync(async(req, res) => {
+  app.patch("/api/1.0/hostel/:id", validateHostelId, validateUpdateHostelDataInput, porterAuth, catchAsync(async(req, res) => {
     let id = req.params.id;
     let data = req.body;
     const hostel = await service.UpdateOne(id, data);

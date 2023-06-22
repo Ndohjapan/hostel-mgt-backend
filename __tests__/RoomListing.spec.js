@@ -2,10 +2,8 @@
 const request = require("supertest");
 const en = require("../locale/en");
 const { connectToDatabase, mongoose } = require("../src/database/connection");
-const mockData = require("./resources/mock-data");
 const app = require("../src/app");
-const { Porter, Hostel, Room } = require("../src/database/model");
-const porterCredentials = { email: "porter1@mail.com", password: "P4ssword" };
+const { assignStudentToRoom, addUser, porterLogin, addRoom, addHostel } = require("./resources/frequently-used-functions");
 
 let token;
 
@@ -20,49 +18,6 @@ afterEach(async () => {
   await mongoose.connection.close();
 });
 
-const addRoom = async (hostel, from = 101, to = 114, maxPerRoom = 4) => {
-  const room = [];
-  for(let i=from; i<=to; i++){
-    room.push({
-      hostel: hostel,
-      maxPerRoom: maxPerRoom,
-      roomNum: i,
-    });
-  }
-  const rooms = await Room.create(room);
-  return rooms;
-};
-
-const addHostel = async (num = 1, hostels = [mockData.hostel]) => {
-  for (let index = 1; index < num; index++) {
-    hostels.push({...hostels[0],
-      name: "Cam David 2 Boys" + index,
-    });
-  }
-  
-  const data = await Hostel.create(hostels);
-  return data;
-};
-
-
-const addPorter = async (porter = mockData.porter1) => {
-  const data = await Porter.create(porter);
-  return data;
-};
-
-const porterLogin = async (porter = porterCredentials) => {
-  await addPorter();
-  let agent = await request(app)
-    .post("/api/1.0/auth")
-    .set("origin", "localhost:7001")
-    .send(porter);
-
-  // Extract the access token from the response body
-  if (agent.body.tokens) {
-    token = agent.body.tokens.accessToken;
-  }
-  return agent;
-};
 
 describe("Get Room By Id", () => {
   const getRoom = async (id) => {
@@ -102,7 +57,7 @@ describe("Get Room By Id", () => {
 
     const rooms = await addRoom(hostels[0].id);
 
-    await porterLogin();
+    token = await porterLogin();
     const response = await getRoom(rooms[0].id);
 
     expect(response.status).toBe(200);
@@ -113,10 +68,25 @@ describe("Get Room By Id", () => {
 
     const rooms = await addRoom(hostels[0].id);
 
-    await porterLogin();
+    token = await porterLogin();
     const response = await getRoom(rooms[0].id);
 
     expect(response.body.hostel).toBe(hostels[0].id);
+  });
+
+  it("check - populate the students field if their are students already in the room", async() => {
+    const users = await addUser();
+    const hostels = await addHostel();
+
+    const rooms = await addRoom(hostels[0].id);
+
+    token = await porterLogin();
+
+    await assignStudentToRoom(rooms[0].id, users[0].id);
+
+    const response = await getRoom(rooms[0].id);
+
+    expect(response.body.students[0]._id).toBe(users[0].id);
   });
 });
 
@@ -158,7 +128,7 @@ describe("Get All Rooms with Pagination", () => {
     const hostels = await addHostel();
 
     await addRoom(hostels[0].id);
-    await porterLogin();
+    token = await porterLogin();
 
     const response = await getRooms();
 
@@ -169,7 +139,7 @@ describe("Get All Rooms with Pagination", () => {
     const hostels = await addHostel();
 
     await addRoom(hostels[0].id);
-    await porterLogin();
+    token = await porterLogin();
 
     const response = await getRooms();
     
@@ -199,7 +169,7 @@ describe("Get Rooms By Filtering", () => {
     await addRoom(hostels[1].id, 211, 230);
     await addRoom(hostels[0].id);
 
-    await porterLogin();
+    token = await porterLogin();
 
     const response = await getRooms({hostel: hostels[1].id});
 
@@ -212,7 +182,7 @@ describe("Get Rooms By Filtering", () => {
     await addRoom(hostels[1].id, 211, 230);
     await addRoom(hostels[0].id);
 
-    await porterLogin();
+    token = await porterLogin();
 
     const response = await getRooms({hostel: hostels[1].id});
 
@@ -226,7 +196,7 @@ describe("Get Rooms By Filtering", () => {
     await addRoom(hostels[1].id, 211, 230);
     await addRoom(hostels[0].id);
 
-    await porterLogin();
+    token = await porterLogin();
 
     const response = await getRooms({hostel: hostels[1].id}, 1, 20);
     let filterCheck = true;
