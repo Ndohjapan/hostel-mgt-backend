@@ -113,6 +113,7 @@ class RoomRepository {
             hostel: 1,
             maxPerRoom: 1,
             numOfStudents: 1,
+            roomNum: 1,
             hasVacancy: { $lt: ["$numOfStudents", "$maxPerRoom"] }
           }
         },

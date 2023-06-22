@@ -61,7 +61,7 @@ describe("List Rooms that are availaeble", () => {
     expect(response.status).toBe(200);
   });
 
-  it("check - ensure that all the fields returned have a vacant space", async() => {
+  it("check - ensure that all the rooms returned have a vacant space", async() => {
     token = await porterLogin();
     const users = await addUser(8);
     const hostels = await addHostel();
@@ -82,6 +82,37 @@ describe("List Rooms that are availaeble", () => {
 
     for(room of response.body){
       if(room.numOfStudents >= room.maxPerRoom || room.hostel != hostels[0].id){
+        filterCheck = false;
+        break;
+      }
+    }
+
+    expect(response.body.length).toBe(13);
+    expect(filterCheck).toBeTruthy();
+
+  });
+
+  it("check - ensure that all the rooms returned have a vacant space and a room number", async() => {
+    token = await porterLogin();
+    const users = await addUser(8);
+    const hostels = await addHostel();
+    const rooms = await addRoom(hostels[0].id);
+
+    await assignStudent(rooms[0].id, users[0].id);
+    await assignStudent(rooms[0].id, users[1].id);
+    await assignStudent(rooms[0].id, users[2].id);
+    await assignStudent(rooms[0].id, users[3].id);
+    await assignStudent(rooms[1].id, users[4].id);
+    await assignStudent(rooms[1].id, users[5].id);
+    await assignStudent(rooms[2].id, users[6].id);
+    await assignStudent(rooms[2].id, users[7].id);
+
+    const response = await getAvailableRooms(hostels[0].id);
+
+    let filterCheck = true;
+
+    for(room of response.body){
+      if(!room.roomNum){
         filterCheck = false;
         break;
       }
