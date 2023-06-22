@@ -1,5 +1,6 @@
 const { porterAuth } = require("../middleware/protect");
 const { validateUserId, validateUserRoomAssignmentInput, validateUserRoomRemovalInput } = require("../middleware/user-input-validation");
+const { HostelService } = require("../service/hostel-service");
 const { RoomService } = require("../service/room-service");
 const { UserService } = require("../service/user-service");
 const catchAsync = require("../util/catch-async");
@@ -7,6 +8,7 @@ const catchAsync = require("../util/catch-async");
 module.exports = async(app) => {
   const service = new UserService();
   const roomService = new RoomService();
+  const hostelService = new HostelService();
 
   app.get("/api/1.0/user", porterAuth, catchAsync(async(req, res) => {
     let {page, limit} = req.query;
@@ -33,16 +35,22 @@ module.exports = async(app) => {
 
   app.post("/api/1.0/user/assign", validateUserRoomAssignmentInput, porterAuth, catchAsync(async(req, res) => {
     const {roomId, userId} = req.body;
-    await roomService.AssignToRoom(roomId, userId);
+    const room = await roomService.AssignToRoom(roomId, userId);
     const user = await service.UpdateOne(userId, {room: roomId});
+    if(room){
+      await hostelService.UpdateOne(room.hostel, {$inc: {totalStudents: 1}});
+    }
     res.send(user);
   }));
 
   app.post("/api/1.0/user/remove", validateUserRoomRemovalInput, porterAuth, catchAsync(async(req, res) => {
     const {userId} = req.body;
     let user = await service.FindById(userId);
-    await roomService.RemoveFromRoom(user.room._id, userId);
+    const room = await roomService.RemoveFromRoom(user.room._id, userId);
     user = await service.UpdateOne(userId, {room: null});
+    if(room){
+      await hostelService.UpdateOne(room.hostel, {$inc: {totalStudents: -1}});
+    }
     res.send(user);
   }));
 

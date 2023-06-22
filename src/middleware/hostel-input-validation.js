@@ -49,4 +49,24 @@ const validateHostelDataInput = [
   }
 ];
 
-module.exports = { validateHostelId, validateHostelDataInput };
+const validateUpdateHostelDataInput = [
+  check("maxPerRoom")
+    .optional()
+    .isInt({min: 1})
+    .withMessage(en.max_per_room_format),
+  check("sex")
+    .optional()
+    .isString()
+    .isIn(["Male", "Female"])
+    .withMessage(en.sex_format),
+      
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(new ValidationException(errors.array()));
+    }
+    next();
+  }
+];
+
+module.exports = { validateHostelId, validateHostelDataInput, validateUpdateHostelDataInput };

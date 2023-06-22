@@ -146,8 +146,8 @@ class RoomRepository {
         
       room.students.addToSet(userId);
         
-      await room.save();
-      return true;
+      const result = await room.save();
+      return result;
           
     } catch (error) {
       throw new internalException(
@@ -170,7 +170,7 @@ class RoomRepository {
         { $set: { numOfStudents: room.students.length } }
       );
 
-      return true;
+      return room;
           
     } catch (error) {
       throw new internalException(

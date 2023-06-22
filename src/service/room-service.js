@@ -15,6 +15,7 @@ class RoomService{
           hostel: data.hostel,
           maxPerRoom: data.maxPerRoom,
           roomNum: i,
+          numOfStudents: 0
         });
       }
       const rooms = await this.repository.CreateRooms(room);
@@ -68,6 +69,7 @@ class RoomService{
     data.students = "";
     data.hostel = "";
     data.roomNum = "";
+    data.numOfStudents = "";
 
     Object.entries(data).forEach(([key, value]) => {
       if (value != "") {

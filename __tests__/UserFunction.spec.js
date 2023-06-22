@@ -5,7 +5,7 @@ const {
   connectToDatabase,
   mongoose
 } = require("../src/database/connection");
-const { Room, User } = require("../src/database/model");
+const { Room, User, Hostel } = require("../src/database/model");
 const { addUser, addHostel, addRoom, porterLogin } = require("./resources/frequently-used-functions");
 const en = require("../locale/en");
 
@@ -218,6 +218,48 @@ describe("Assign User To Room", () => {
     expect(roomdb[1].students.length).toBe(0);
 
   });
+
+  it("return - HTTP 400 when we try to assign a user to a room which is already in", async() => {
+    token = await porterLogin();
+    const users = await addUser(2);
+    const hostels = await addHostel();
+    const rooms = await addRoom(hostels[0].id);
+
+    await assignStudent(rooms[0].id, users[0].id);
+    await assignStudent(rooms[0].id, users[1].id);
+    const response = await assignStudent(rooms[0].id, users[0].id);
+
+    expect(response.status).toBe(400);
+
+  });
+
+  it(`return - ${en.user_room_duplicate_error}HTTP 400 when we try to assign a user to a room which is already in`, async() => {
+    token = await porterLogin();
+    const users = await addUser(2);
+    const hostels = await addHostel();
+    const rooms = await addRoom(hostels[0].id);
+
+    await assignStudent(rooms[0].id, users[0].id);
+    await assignStudent(rooms[0].id, users[1].id);
+    const response = await assignStudent(rooms[0].id, users[0].id);
+
+    expect(response.body.message).toBe(en.user_room_duplicate_error);
+
+  });
+  
+  it("check - ensure the total students for that hostel increased when a user was assigned to a room of the hostel", async() => {
+    token = await porterLogin();
+    const users = await addUser();
+    const hostels = await addHostel();
+    const rooms = await addRoom(hostels[0].id);
+
+    await assignStudent(rooms[0].id, users[0].id);
+
+    const hosteldb = await Hostel.findById(hostels[0].id);
+
+    expect(hosteldb.totalStudents).toBe(1);
+
+  });
 });
 
 describe("Remove User From Room", () => {
@@ -337,6 +379,31 @@ describe("Remove User From Room", () => {
     expect(roomDb.students.length).toBe(1);
     expect(roomDb.students.includes(users[0].id)).toBeFalsy();
     expect(roomDb.students.includes(users[1].id)).toBeTruthy();
+
+  });
+
+  it("check - ensure the total number of students in the hostel also reduced after the student was removed from a room in the hostel", async() => {
+    token = await porterLogin();
+    const users = await addUser(3);
+    const hostels = await addHostel();
+    const rooms = await addRoom(hostels[0].id);
+
+    await assignStudent(rooms[0].id, users[0].id);
+    await assignStudent(rooms[0].id, users[1].id);
+    await assignStudent(rooms[0].id, users[2].id);
+
+    await removeStudent(users[0].id);
+
+    let hosteldb = await Hostel.findById(hostels[0].id);
+    
+    
+    expect(hosteldb.totalStudents).toBe(2);
+    
+    await removeStudent(users[1].id);
+    
+    hosteldb = await Hostel.findById(hostels[0].id);
+    
+    expect(hosteldb.totalStudents).toBe(1);
 
   });
 });

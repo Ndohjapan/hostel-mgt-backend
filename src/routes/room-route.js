@@ -1,6 +1,6 @@
 const { validateHostelId } = require("../middleware/hostel-input-validation");
 const { porterAuth } = require("../middleware/protect");
-const { validateRoomId, validateRoomDataInput} = require("../middleware/room-input-validation");
+const { validateRoomId, validateRoomDataInput, validateUpdateRoomDataInput} = require("../middleware/room-input-validation");
 const { HostelService } = require("../service/hostel-service");
 const { RoomService } = require("../service/room-service");
 
@@ -44,7 +44,7 @@ module.exports = async(app) => {
     res.send(rooms);
   }));
 
-  app.patch("/api/1.0/room/:id", validateRoomId, porterAuth, catchAsync(async(req, res) => {
+  app.patch("/api/1.0/room/:id", validateRoomId, validateUpdateRoomDataInput, porterAuth, catchAsync(async(req, res) => {
     let id = req.params.id;
     let data = req.body;
     const hostel = await service.UpdateOne(id, data);
